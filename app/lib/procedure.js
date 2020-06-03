@@ -27,7 +27,7 @@ module.exports.getFlattenedFilePaths = async function(bootPaths) {
     );
   }
   const filePaths = await Promise.all(readyFilePaths);
-  return filePaths.flat(1);
+  return filePaths.reduce((p, c) => p.concat(c), []);
 };
 
 module.exports.loadOrderedScripts = function(bootFiles, processer) {
