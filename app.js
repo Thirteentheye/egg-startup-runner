@@ -5,6 +5,14 @@ const procedure = require('./app/lib/procedure');
 module.exports = class App {
   constructor(app) {
     this.app = app;
+    this.app.messenger.once('egg-startup-runner-oncetask', activate => {
+      if (activate) {
+        this.app.createAnonymousContext().runInBackground(async () => {
+          await procedure.runScripts(this.scripts.filter(s => s.options.once), 'app', 'once');
+        });
+        this.app.messenger.sendToApp('egg-startup-runner-oncetask', false);
+      }
+    });
   }
 
   async didLoad() {

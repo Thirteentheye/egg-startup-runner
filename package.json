@@ -1,6 +1,6 @@
 {
   "name": "egg-startup-runner",
-  "version": "0.0.3",
+  "version": "0.1.3",
   "description": "Run startup codes in parallel and serially from different files",
   "eggPlugin": {
     "name": "startupRunner"

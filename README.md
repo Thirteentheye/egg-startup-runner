@@ -107,7 +107,38 @@ module.exports = pro => {
 
 `options`中`didLoad`、`willReady`、`didReady`和`serverDidReady`对应需要运行的生命周期，设置为`true`后将在相应的生命周期内运行`start`函数。
 
-`start`函数被调用时插件会将当前的执行进程和生命周期作为参数传入，如上`meta`中的`pname`为当前的执行进程名字，值为`"app"`或`"agent"`。`stage`为当前的生命周期名字，值`didLoad`、`willReady`、`didReady`和`serverDidReady`中的一个。
+`start`函数被调用时插件会将当前的执行进程和生命周期作为参数传入，如上`meta`中的`pname`为当前的执行进程名字，值为`"app"`或`"agent"`。`stage`为当前的生命周期名字，值`"didLoad"`、`"willReady"`、`"didReady"`和`"serverDidReady"`中的一个。
+
+### 单次运行
+
+一些初始任务只需要单个进程运行（也可以交由`agent`进程运行，`agent`毕竟只有一个，这里设置的是单个`app`中的情况），此时可通过以下方式进行。**注意，由于目前只能通过进程间通讯较为简单地达成向任意单个`worker（app）`进程发送命令，所以单次运行的任务只会在`serverDidReady`生命周期后运行。**
+
+```js
+// app/boot/once.js
+module.exports = app => {
+  return {
+    options: {
+      order: 1,
+      app: true,
+      once: true
+    },
+    async start(meta) {
+      if (meta.pname === 'app') {
+        app.str = 8;
+      }
+      if (meta.stage === 'once') {
+        app.vit = 8;
+      }
+    },
+  };
+};
+```
+
+`app: true`必选。
+
+由于设置了`once`，`once`的任务执行时只会在`app`进行，所以传入的参数只会是app实例，当然，如果设置了`agent`和其它生命周期，在对应周期也会是对应实例。
+
+`once`任务中，`meta`参数将传入字符串`"app"`和`"once"`。
 
 ## License
 

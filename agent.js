@@ -24,5 +24,6 @@ module.exports = class Agent {
 
   async serverDidReady() {
     await procedure.runScripts(this.scripts, 'agent', 'serverDidReady');
+    this.agent.messenger.sendRandom('egg-startup-runner-oncetask', true);
   }
 };
