@@ -8,9 +8,7 @@ module.exports = class Agent {
   }
 
   async didLoad() {
-    const bootPaths = procedure.getBootPaths(this.agent.config.startupRunner, this.agent.baseDir);
-    const bootFiles = await procedure.getFlattenedFilePaths(bootPaths);
-    this.scripts = procedure.loadOrderedScripts(bootFiles, this.agent);
+    this.scripts = await procedure.getScripts(this.agent);
     await procedure.runScripts(this.scripts, 'agent', 'didLoad');
   }
 

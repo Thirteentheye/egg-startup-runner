@@ -8,7 +8,11 @@ module.exports = class App {
     this.app.messenger.once('egg-startup-runner-oncetask', activate => {
       if (activate) {
         this.app.createAnonymousContext().runInBackground(async () => {
-          await procedure.runScripts(this.scripts.filter(s => s.options.once), 'app', 'once');
+          let scripts = this.scripts;
+          if (!scripts) {
+            scripts = await procedure.getScripts(this.app);
+          }
+          await procedure.runScripts(scripts.filter(s => s.options.once), 'app', 'once');
         });
         this.app.messenger.sendToApp('egg-startup-runner-oncetask', false);
       }
@@ -16,9 +20,7 @@ module.exports = class App {
   }
 
   async didLoad() {
-    const bootPaths = procedure.getBootPaths(this.app.config.startupRunner, this.app.baseDir);
-    const bootFiles = await procedure.getFlattenedFilePaths(bootPaths);
-    this.scripts = procedure.loadOrderedScripts(bootFiles, this.app);
+    this.scripts = await procedure.getScripts(this.app);
     this.app.coreLogger.info('[egg-startup-runner] %d script(s) found on startup', this.scripts.length);
     await procedure.runScripts(this.scripts, 'app', 'didLoad');
   }

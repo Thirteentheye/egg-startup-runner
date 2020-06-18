@@ -41,6 +41,12 @@ module.exports.loadOrderedScripts = function(bootFiles, processer) {
   return scripts.sort((p, v) => p.options.order - v.options.order);
 };
 
+module.exports.getScripts = async function(processer) {
+  const bootPaths = this.getBootPaths(processer.config.startupRunner, processer.baseDir);
+  const bootFiles = await this.getFlattenedFilePaths(bootPaths);
+  return this.loadOrderedScripts(bootFiles, processer);
+};
+
 module.exports.runScripts = async function(scripts, pname, stage) {
   let lastOrder = Number.NEGATIVE_INFINITY;
   let batch = [];
