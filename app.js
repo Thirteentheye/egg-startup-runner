@@ -34,6 +34,10 @@ module.exports = class App {
   }
 
   async serverDidReady() {
-    await procedure.runScripts(this.scripts, 'app', 'serverDidReady');
+    let scripts = this.scripts;
+    if (!scripts) {
+      scripts = await procedure.getScripts(this.app);
+    }
+    await procedure.runScripts(scripts, 'app', 'serverDidReady');
   }
 };
